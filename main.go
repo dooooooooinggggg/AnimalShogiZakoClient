@@ -18,7 +18,7 @@ func main() {
 }
 
 func sendMessage(conn net.Conn) {
-	for {
+	for i := 0; i < 10; i++ {
 		conn.Write([]byte("\n"))
 		message, _ := bufio.NewReader(conn).ReadString('\n')
 		log.Print("Message from server: " + message)
