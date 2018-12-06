@@ -17,11 +17,35 @@ func main() {
 	sendMessage(conn)
 }
 
+func initConn(conn net.Conn) {
+	conn.Write([]byte("LOGIN:Saikyou_AI\n"))
+	conn.Write([]byte("AGREE\n"))
+	message, _ := bufio.NewReader(conn).ReadString('\n')
+	fmt.Printf("%s\n", message)
+}
+
 func sendMessage(conn net.Conn) {
+	// ここ(対局相手が見つかったタイミング)で，自分が先手か後手か判定したい
+	// てかここの初期化の処理書かないと
+	// それまでここでストップしないと
+
+	for {
+		message, _ := bufio.NewReader(conn).ReadString('\n')
+		fmt.Printf("message is %s\n", message)
+		if message == "Your_Turn:+" || message == "Your_Turn:-" {
+			fmt.Printf("%s\n", message)
+			break
+		}
+	}
+
+	initConn(conn)
 	for i := 0; i < 10; i++ {
-		conn.Write([]byte("\n"))
+		conn.Write([]byte("+2a2b\n"))
 		message, _ := bufio.NewReader(conn).ReadString('\n')
 		log.Print("Message from server: " + message)
-		break
 	}
+}
+
+func taiketsu(conn net.Conn) {
+
 }
