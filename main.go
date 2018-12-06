@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"net"
 
@@ -30,12 +31,22 @@ func sendMessage(conn net.Conn) {
 	// それまでここでストップしないと
 
 	for {
-		message, _ := bufio.NewReader(conn).ReadString('\n')
-		fmt.Printf("message is %s\n", message)
-		if message == "Your_Turn:+" || message == "Your_Turn:-" {
+		var message string
+		r := bufio.NewReader(conn)
+		for {
+			line, err := r.ReadString('\n')
+			if err == io.EOF {
+				break
+			} else if err != nil {
+				log.Fatal(err)
+			}
 			fmt.Printf("%s\n", message)
-			break
+			if line == "Your_Turn:+\n" || line == "Your_Turn:-\n" {
+				message = line
+				break
+			}
 		}
+		fmt.Printf("message is %s\n", message)
 	}
 
 	initConn(conn)
