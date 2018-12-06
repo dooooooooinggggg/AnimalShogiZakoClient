@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"net"
+	"strings"
+	"time"
 
 	"github.com/dooooooooinggggg/AnimalShogiZakoClient/connect"
 )
@@ -25,13 +27,9 @@ func initConn(conn net.Conn) {
 	fmt.Printf("%s\n", message)
 }
 
-func sendMessage(conn net.Conn) {
-	// ここ(対局相手が見つかったタイミング)で，自分が先手か後手か判定したい
-	// てかここの初期化の処理書かないと
-	// それまでここでストップしないと
-
+func checkResponse(conn net.Conn, checkString string) string {
+	var res string
 	for {
-		var message string
 		r := bufio.NewReader(conn)
 		for {
 			line, err := r.ReadString('\n')
@@ -40,16 +38,31 @@ func sendMessage(conn net.Conn) {
 			} else if err != nil {
 				log.Fatal(err)
 			}
-			fmt.Printf("%s\n", message)
-			if line == "Your_Turn:+\n" || line == "Your_Turn:-\n" {
-				message = line
+
+			if strings.Contains(line, checkString) {
+				res = line
 				break
 			}
 		}
-		fmt.Printf("message is %s\n", message)
+		if res != "" {
+			break
+		}
+		time.Sleep(1 * time.Second)
 	}
+	return res
+}
 
+func sendMessage(conn net.Conn) {
+	// ここ(対局相手が見つかったタイミング)で，自分が先手か後手か判定したい
+	// てかここの初期化の処理書かないと
+	// それまでここでストップしないと
+
+	myTurn := checkResponse(conn, "Your_Turn:")
+	fmt.Printf("my turn is %s\n", myTurn)
 	initConn(conn)
+
+	return
+
 	for i := 0; i < 10; i++ {
 		conn.Write([]byte("+2a2b\n"))
 		message, _ := bufio.NewReader(conn).ReadString('\n')
