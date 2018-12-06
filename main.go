@@ -10,16 +10,18 @@ import (
 )
 
 func main() {
-	conn := connect.TcpConnection()
+	conn := connect.TCPConnection()
 	defer conn.Close()
 	fmt.Printf("Connected to 'Animal Shogi Server'\n")
+	go connect.KeepAlive(conn)
 	sendMessage(conn)
 }
 
 func sendMessage(conn net.Conn) {
-	text := "BEGIN Game_Summary"
-	log.Print("Will send text: " + text)
-	conn.Write([]byte(text + "\n"))
-	message, _ := bufio.NewReader(conn).ReadString('\n')
-	log.Print("Message from server: " + message)
+	for {
+		conn.Write([]byte("\n"))
+		message, _ := bufio.NewReader(conn).ReadString('\n')
+		log.Print("Message from server: " + message)
+		break
+	}
 }

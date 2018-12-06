@@ -1,19 +1,26 @@
 package connect
 
 import (
+	"fmt"
 	"log"
 	"net"
+	"time"
 )
 
-// tcp connection
-func TcpConnection() net.Conn {
-	conn, err := net.Dial("tcp", "shogi.keio.app"+":"+"80")
+// TCPConnection func
+func TCPConnection() net.Conn {
+	conn, err := net.Dial("tcp", "shogi.keio.app:80")
 	if err != nil {
 		log.Fatal(err)
 	}
 	return conn
 }
 
-func KeepAlive() {
-
+// KeepAlive func
+func KeepAlive(conn net.Conn) {
+	fmt.Printf("Keep Alive!\n")
+	for {
+		conn.Write([]byte(" " + "\n"))
+		time.Sleep(30 * time.Second)
+	}
 }
