@@ -18,8 +18,8 @@ func TCPConnection() net.Conn {
 
 // KeepAlive func
 func KeepAlive(conn net.Conn) {
-	fmt.Printf("Keep Alive!\n")
 	for {
+		fmt.Printf("Keep Alive!\n")
 		conn.Write([]byte(" " + "\n"))
 		time.Sleep(30 * time.Second)
 	}
